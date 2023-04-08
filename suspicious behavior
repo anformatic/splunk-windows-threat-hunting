@@ -3,4 +3,4 @@
 index="windows*" "Authentication" |stats count by ta_windows_action, user |rename ta_windows_action as action |chart last(count) over user by action |where success>0 and failure>20 |stats dc(user)
 
 '''over 70% Authentication failure'''
-index="windows*" |stats count by status, user | chart last(count) over user by status | fillnull value=0 | where failure >= 10 | eval perc_failures = 100*failure/(failure + success) | where perc_failures >= 70 | stats count
+index="windows*" | stats count by status, user | chart last(count) over user by status   | fillnull value=0   | where failure >= 200   | eval perc_failures = 100*failure/(failure + success)   | where perc_failures >= 70 and perc_failures < 100
