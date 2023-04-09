@@ -4,3 +4,9 @@ index="windows*" "Authentication" |stats count by ta_windows_action, user |renam
 
 '''over 70% Authentication failure'''
 index="windows*" | stats count by status, user | chart last(count) over user by status   | fillnull value=0   | where failure >= 200   | eval perc_failures = 100*failure/(failure + success)   | where perc_failures >= 70 and perc_failures < 100
+
+'''faild to logon and their method'''
+index="windows-server-security" EventCode=4625 |fillnull value=NULL | eval Account_Name = mvindex(Account_Name,1) | eval Security_ID = mvindex(Security_ID,1) 
+| eval LoginType=case(Logon_Type=3,"RPC (not RDP)",Logon_Type=4,"Batch",Logon_Type=5,"Service",Logon_Type=7,"Screen Unlock/Session Resume",Logon_Type=10,"Remote Desktop",Logon_Type=11,"Cached",Logon_Type=9,"New Credentials")
+|stats count(Security_ID) as "Login Events" by Security_ID, Account_Name, LoginType,host,_time  |sort + Security_ID
+
